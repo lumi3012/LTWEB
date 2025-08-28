@@ -45,7 +45,7 @@ public class HelloServlet extends HttpServlet {
 		}
 			
 		if (name.equals("")) {
-			resp.sendRedirect("/HelloServlet/login");
+			resp.sendRedirect("/HelloServlet/login1");
 		}
 		printWriter.println("Xin chao" + name);
 	}
