@@ -4,7 +4,7 @@ import java.sql.DriverManager;
 
 public class DBConnect {
 	private final String serverName = "LUMI3012";
-	private final String dbName = "USERS";
+	private final String dbName = "LTWEB";
 	private final String portNumber = "1433";
 	private final String instance = "SQLEXPRESS01";
 	private final String userID = "sa";

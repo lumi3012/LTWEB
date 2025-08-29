@@ -22,10 +22,10 @@ import loginRegister_bt02.service.UserServiceImpl;
 @SuppressWarnings("serial")
 @WebServlet(urlPatterns = "/login")
 public class LoginController extends HttpServlet {
-	private UserService userService = new UserServiceImpl();
 
 	private static final long serialVersionUID = 1L;
 
+	private UserService userService = new UserServiceImpl();
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
@@ -42,31 +42,27 @@ public class LoginController extends HttpServlet {
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		resp.getWriter().append("Served at: ").append(req.getContextPath());
+		
+		req.getRequestDispatcher(Constant.LOGIN).forward(req, resp);
 
 		HttpSession session = req.getSession(false);
-//		if (session != null && session.getAttribute("account") != null) {
-//			resp.sendRedirect(req.getContextPath() + "/waiting");
-//			return;
-//		}
-		
 		if (session != null && session.getAttribute("account") != null) {
-		    resp.sendRedirect(req.getContextPath() + "/views/login.jsp"); // tạm thời
-		    return;
+			resp.sendRedirect(req.getContextPath() + "/waiting");
+			return;
 		}
-
+		
 		Cookie[] cookies = req.getCookies();
 		if (cookies != null) {
 			for (Cookie cookie : cookies) {
 				if (cookie.getName().equals("username")) {
 					session = req.getSession(true);
 					session.setAttribute("username", cookie.getValue());
-					//resp.sendRedirect(req.getContextPath() + "/waiting");
-					resp.sendRedirect(req.getContextPath() + "/views/login.jsp"); // tạm thời
+					resp.sendRedirect(req.getContextPath() + "/waiting");
 					return;
 				}
 			}
 		}
-		req.getRequestDispatcher("views/login.jsp").forward(req, resp);
+		req.getRequestDispatcher("/views/login.jsp").forward(req, resp);
 	}
 
 
@@ -80,8 +76,8 @@ public class LoginController extends HttpServlet {
 		doGet(req, resp);
 
 		resp.setContentType("text/html");
-		resp.setCharacterEncoding("UTF-8");
 		req.setCharacterEncoding("UTF-8");
+		
 		String username = req.getParameter("username");
 		String password = req.getParameter("password");
 		boolean isRememberMe = false;
@@ -97,8 +93,8 @@ public class LoginController extends HttpServlet {
 			req.getRequestDispatcher("/views/login.jsp").forward(req, resp);
 			return;
 		}
-		UserService service = new UserServiceImpl();
-		User user = service.login(username, password);
+		
+		User user = userService.login(username, password);
 
 		if (user != null) {
 			HttpSession session = req.getSession(true);
@@ -106,8 +102,8 @@ public class LoginController extends HttpServlet {
 			if (isRememberMe) {
 				saveRemeberMe(resp, username);
 			}
-			//resp.sendRedirect(req.getContextPath() + "/waiting");
-			resp.sendRedirect(req.getContextPath() + "/views/login.jsp"); // tạm thời
+			resp.sendRedirect(req.getContextPath() + "waiting");
+			//resp.sendRedirect(req.getContextPath() + "/views/home.jsp"); // tạm thời
 		} else {
 			alertMsg = "Tài khoản hoặc mật khẩu không đúng";
 			req.setAttribute("alert", alertMsg);
@@ -117,6 +113,7 @@ public class LoginController extends HttpServlet {
 	private void saveRemeberMe(HttpServletResponse response, String username) {
 		Cookie cookie = new Cookie(Constant.COOKIE_REMEMBER, username);
 		cookie.setMaxAge(30 * 60);
+		cookie.setPath("/");
 		response.addCookie(cookie);
 	}
 }

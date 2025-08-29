@@ -10,12 +10,15 @@ public class UserDaoImpl implements UserDao {
 	
 	@Override
 	public boolean register(User user) {
-		String sql = "INSERT INTO Users(username, password, email) VALUES(?, ?, ?)";
+		String sql = "INSERT INTO Users(username, fullname, password, phone, roleid, email) VALUES(?, ?, ?, ?, ?, ?)";
 		try (Connection conn = new DBConnect().getConnection();
 				PreparedStatement ps = conn.prepareStatement(sql)) {
 			ps.setString(1, user.getUsername());
+			ps.setString(2, user.getFullname());
 			ps.setString(3, user.getPassword());
-			ps.setString(5, user.getEmail());
+			ps.setString(4, user.getPhone());
+			ps.setInt(5, user.getRoleid());
+			ps.setString(6, user.getEmail());
 			return ps.executeUpdate() > 0;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -29,7 +32,7 @@ public class UserDaoImpl implements UserDao {
 		try (Connection conn = new DBConnect().getConnection();
 				PreparedStatement ps = conn.prepareStatement(sql)) {
 			ps.setString(1, username);
-			ps.setString(3, password);
+			ps.setString(2, password);
 			ResultSet rs = ps.executeQuery();
 			if (rs.next()) {
 				return new User(
@@ -38,7 +41,8 @@ public class UserDaoImpl implements UserDao {
 						rs.getString("fullname"),
 						rs.getString("password"),
 						rs.getString("phone"),
-						rs.getString("email")
+						rs.getInt("roleid"),
+						rs.getString("email")				
 				);
 			}
 		} catch (Exception e) {
