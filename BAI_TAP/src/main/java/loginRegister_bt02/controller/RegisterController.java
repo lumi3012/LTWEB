@@ -12,55 +12,51 @@ import loginRegister_bt02.service.UserService;
 import loginRegister_bt02.service.UserServiceImpl;
 import loginRegister_bt02.Constant;
 
-/**
- * Servlet implementation class RegisterController
- */
-@WebServlet(urlPatterns="/register")
+@WebServlet(urlPatterns = "/register")
 public class RegisterController extends HttpServlet {
-	private static final long serialVersionUID = 1L;
-	private UserService userService = new UserServiceImpl();
-       
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public RegisterController() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
+    private static final long serialVersionUID = 1L;
+    private UserService userService = new UserServiceImpl();
 
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) 
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         req.getRequestDispatcher(Constant.REGISTER).forward(req, resp);
     }
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
-	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		doGet(req, resp);
-		
-		String username = req.getParameter("username");
-		String fullname = req.getParameter("fullname");
-		String password = req.getParameter("password");
-		String phone = req.getParameter("phone");
-		int roleid = Integer.parseInt(req.getParameter("roleid")); 
-		String email = req.getParameter("email");
-		
-		User user = new User(0, username, fullname, password, phone, roleid, email);
-		boolean success = userService.register(user);
-		
-		if (success) {
-			resp.sendRedirect("views/login.jsp");
-		} else {
-			req.setAttribute("error", "Register failed!");
-			req.getRequestDispatcher("views/register.jsp").forward(req, resp);
-		}
-	}
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+        req.setCharacterEncoding("UTF-8");
+        resp.setCharacterEncoding("UTF-8");
 
+        String username = req.getParameter("username");
+        String fullname = req.getParameter("fullname");
+        String password = req.getParameter("password");
+        String phone    = req.getParameter("phone");
+        int roleid      = Integer.parseInt(req.getParameter("roleid"));
+        String email    = req.getParameter("email");
+
+        // Check tồn tại trước khi insert
+        if (userService.checkExistEmail(email)) {
+            req.setAttribute("alert", "Email đã tồn tại!");
+            req.getRequestDispatcher(Constant.REGISTER).forward(req, resp);
+            return;
+        }
+        if (userService.checkExistUsername(username)) {
+            req.setAttribute("alert", "Tài khoản đã tồn tại!");
+            req.getRequestDispatcher(Constant.REGISTER).forward(req, resp);
+            return;
+        }
+
+        // Tạo user mới
+        User user = new User(0, username, fullname, password, phone, roleid, email);
+
+        if (userService.register(user)) {
+            req.setAttribute("alert", "🎉 Đăng ký thành công! Vui lòng đăng nhập.");
+            req.getRequestDispatcher(Constant.LOGIN).forward(req, resp);
+        } else {
+            req.setAttribute("alert", "⚠️ Đăng ký thất bại!");
+            req.getRequestDispatcher(Constant.REGISTER).forward(req, resp);
+        }
+    }
 }

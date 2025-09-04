@@ -2,7 +2,13 @@ package loginRegister_bt02.service;
 import loginRegister_bt02.model.User;
 
 public interface UserService {
-	boolean register(User user);
+	
 	User login(String username, String password);
-	//User get(String username);
+    void insert(User user);
+    boolean register(User user);
+    boolean checkExistEmail(String email);
+    boolean checkExistUsername(String username);
+    boolean checkExistPhone(String phone);
+    
+    User findByEmail(String email);
 }
